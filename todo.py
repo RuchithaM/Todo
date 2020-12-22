@@ -21,28 +21,11 @@ def parse_arg():
     my_group.add_argument('-ls', action='store_true',default=None)
     my_group.add_argument('-del',type=int)
     my_group.add_argument('-done',type=int)
+    my_group.add_argument('-report', action='store_true',default=None)
     args = my_parser.parse_args()
     return(vars(args)) #{'add': ['water'], 'ls': None, 'del': None, 'done': None}
 
-
-
-def add(argument):
-    with open('todo.txt','a') as file:
-        file.write(str(argument)+'\n')
-    print('Added todo : "{}"'.format(argument))   
-    
-def dele(argument):
-    
-    pass
-
-def done(argument):
-    with open('done.txt','a') as file:
-        time=date.today()
-        file.write(str(time))
-        file.write(' '+str(argument)+'\n') 
-
-
-def ls():
+def reverse_mapping():
     with open('todo.txt','r') as file:
         c=[]
         for i in file:
@@ -53,19 +36,66 @@ def ls():
             for j in range (len (m)):
                 if c[i] == m[j]:
                     d[j+1]=m[i]
-                    v=j+1
-                    print('[{}] {}'.format(j+1,m[i]))  
-                    
-        
+    return(d)
 
+def add(argument):
+    with open('todo.txt','a') as file:
+        file.write(str(argument)+'\n')
+    print('Added todo : "{}"'.format(argument))   
+    
+def check_for_todo_exist(argument):
+    d=reverse_mapping()
+    print(d)   #items
+    if argument in d:
+        string=d[argument]
+        return(string)
+    else:
+        print("Error: todo #{} does not exist. Nothing deleted.".format(argument))
+        return(False)
+
+def remove_string_from_file(file_name,string):
+    #print(string,file_name)
+    with open('todo.txt', "r") as f:
+        lines = f.readlines()
+    with open('todo.txt', "w") as f:
+        for line in lines:
+            if not line == string:
+                f.write(line)
+            
+
+def dele(argument):
+    s=check_for_todo_exist(argument)
+    if s != False :
+        remove_string_from_file('todo.txt',str(s))
+    else:
+        pass
+def done(argument):
+    s=check_for_todo_exist(argument)
+    if s != False :
+        remove_string_from_file('todo.txt',s)
+        with open('done.txt','a') as file:
+            print(s)
+            file.write('x '+str(date.today())+" "+s)
+        print("Marked todo #{} as done.".format(argument))
+
+def ls():
+    d=reverse_mapping()
+    for item in d:
+        print("[{}] {}".format(item,d[item])) 
+                 
+def report():
+    with open("todo.txt",'r') as f:
+        pending=len(f.readlines())
+    with open("done.txt",'r') as f:
+        completed=len(f.readlines())  
+    print(str(date.today())+" Pending : {} Completed : {}".format(pending,completed))
 
 def resolve_arguments(args): 
     #which argument is not null
     for i, j in args.items():
         if j != None:
             return(i,j)
-        elif i=='ls':
-            return(i)
+        
     
        
 def fun_call(operation):
@@ -74,11 +104,13 @@ def fun_call(operation):
         if i == 'add':
             add(operation[1][0])
         elif i== 'del':
-            dele(int(operation[1]))
+            dele(operation[1])
         elif i== 'done':
             done(int(operation[1]))
         elif i== 'ls':
             ls()
+        elif i=='report':
+            report()
         
         
 
@@ -86,5 +118,6 @@ if __name__ == '__main__':
     file_path = os.getcwd()
     create_files (file_path) 
     arguments=parse_arg()
+    #print(arguments)
     operation=list(resolve_arguments(arguments))
     fun_call(operation)
