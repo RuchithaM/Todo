@@ -15,14 +15,15 @@ def create_files(path):
             pass
 
 def parse_arg():
-    my_parser = argparse.ArgumentParser()
-    my_group = my_parser.add_mutually_exclusive_group()
-    my_group.add_argument('-add',nargs='*',type=str,default=None)
-    my_group.add_argument('-ls', action='store_true',default=None)
-    my_group.add_argument('-del',type=int)
-    my_group.add_argument('-done',type=int)
-    my_group.add_argument('-report', action='store_true',default=None)
-    args = my_parser.parse_args()
+    parser = argparse.ArgumentParser()
+    subparser = parser.add_subparsers()
+    create_parser = subparser.add_parser('todo')
+    create_parser.add_argument('-add',nargs='*',type=str,default=None)
+    create_parser.add_argument('-ls', action='store_true',default=None)
+    create_parser.add_argument('-del',type=int)
+    create_parser.add_argument('-done',type=int)
+    create_parser.add_argument('-report', action='store_true',default=None)
+    args = parser.parse_args()
     return(vars(args)) #{'add': ['water'], 'ls': None, 'del': None, 'done': None}
 
 def reverse_mapping():
