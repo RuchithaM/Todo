@@ -18,12 +18,13 @@ def parse_arg():
     parser = argparse.ArgumentParser()
     subparser = parser.add_subparsers()
     create_parser = subparser.add_parser('todo')
-    create_parser.add_argument('-add',nargs='*',type=str,default=None)
-    create_parser.add_argument('-ls', action='store_true',default=None)
-    create_parser.add_argument('-del',type=int)
-    create_parser.add_argument('-done',type=int)
-    create_parser.add_argument('-report', action='store_true',default=None)
+    create_parser.add_argument('--add',nargs='?',type=str,default=None,help="# Add a new todo")
+    create_parser.add_argument('--ls', action='store_true',default=None,help='# Show remaining todos')
+    create_parser.add_argument('--del',type=int,help="# Delete a todo")
+    create_parser.add_argument('--done',type=int,help="# Complete a todo")
+    create_parser.add_argument('--report', action='store_true',default=None,help=" # Statistics")
     args = parser.parse_args()
+    #print(vars(args))
     return(vars(args)) #{'add': ['water'], 'ls': None, 'del': None, 'done': None}
 
 def reverse_mapping():
@@ -42,7 +43,7 @@ def reverse_mapping():
 def add(argument):
     with open('todo.txt','a') as file:
         file.write(str(argument)+'\n')
-    print('Added todo : "{}"'.format(argument))   
+    print('Added todo: "{}"'.format(argument))   
     
 def check_for_todo_exist(argument):
     d=reverse_mapping()
@@ -83,7 +84,8 @@ def ls():
     d=reverse_mapping()
     for item in d:
         print("[{}] {}".format(item,d[item])) 
-                 
+    else:
+            print("There are no pending todos!")        
 def report():
     with open("todo.txt",'r') as f:
         pending=len(f.readlines())
@@ -101,9 +103,10 @@ def resolve_arguments(args):
        
 def fun_call(operation):
     #call the function based on which argument is not null
+    #print(operation)
     for i in operation:
         if i == 'add':
-            add(operation[1][0])
+            add(operation[1])
         elif i== 'del':
             dele(operation[1])
         elif i== 'done':
